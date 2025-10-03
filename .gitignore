@@ -106,7 +106,3 @@ recover-mcp_champi-promote/
 *.sqlite
 *.sqlite3
 workflow.db
-
-# Runtime files
-*.pid
-*.lock
