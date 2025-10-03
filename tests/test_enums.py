@@ -1,8 +1,8 @@
 """Tests for enum utilities."""
 
-import pytest
 from enum import Enum
-from champi_signals import STTEventTypes, TTSEventTypes, EnumSetup
+
+from champi_signals import EnumSetup, STTEventTypes, TTSEventTypes
 
 
 class TestPreDefinedEnums:

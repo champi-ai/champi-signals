@@ -1,9 +1,11 @@
 """Tests for event processors."""
 
-import pytest
 import asyncio
-from champi_signals import EventProcessor, BaseSignalManager
 from enum import Enum
+
+import pytest
+
+from champi_signals import BaseSignalManager, EventProcessor
 
 
 class ProcessingEventTypes(Enum):
@@ -284,4 +286,7 @@ class TestEventProcessorEdgeCases:
         service.increment_shared()
 
         # Check that class variable was captured in data
-        assert "shared_count" in received_events[0]["data"] or "shared_count_error" in received_events[0]["data"]
+        assert (
+            "shared_count" in received_events[0]["data"]
+            or "shared_count_error" in received_events[0]["data"]
+        )

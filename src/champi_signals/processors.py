@@ -1,8 +1,7 @@
 """Event processor extracted from Champi services."""
 
-import traceback
 import asyncio
-
+import traceback
 
 
 def _execute_with_events(
@@ -41,9 +40,7 @@ def _execute_with_events(
     except AttributeError:
         # Fallback to lifecycle if event_type not found
         signal = (
-            signals.signals.get("lifecycle")
-            if hasattr(signals, "signals")
-            else None
+            signals.signals.get("lifecycle") if hasattr(signals, "signals") else None
         )
 
     if signal is None:
@@ -65,9 +62,7 @@ def _execute_with_events(
                     )
             else:
                 if hasattr(service_instance, var_name):
-                    initial_state[var_name] = getattr(
-                        service_instance, var_name, None
-                    )
+                    initial_state[var_name] = getattr(service_instance, var_name, None)
         except Exception as e:
             initial_state[f"{var_name}_error"] = f"Failed to capture: {str(e)}"
 
@@ -109,9 +104,7 @@ def _execute_with_events(
                             service_instance, var_name, None
                         )
             except Exception as e:
-                final_state[f"{var_name}_error"] = (
-                    f"Failed to capture: {str(e)}"
-                )
+                final_state[f"{var_name}_error"] = f"Failed to capture: {str(e)}"
 
         # Emit SUCCESS event
         try:
@@ -307,15 +300,10 @@ class EventProcessor:
                                 if k != "timestamp"
                             }
                             last_without_timestamp = {
-                                k: v
-                                for k, v in last_values.items()
-                                if k != "timestamp"
+                                k: v for k, v in last_values.items() if k != "timestamp"
                             }
 
-                            if (
-                                values_without_timestamp
-                                != last_without_timestamp
-                            ):
+                            if values_without_timestamp != last_without_timestamp:
                                 try:
                                     signal.send(
                                         event_type=event_type,

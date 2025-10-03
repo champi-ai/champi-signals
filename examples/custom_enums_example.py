@@ -50,7 +50,7 @@ def main():
     # Create and use the signal manager
     signals = NLPSignalManager()
 
-    def nlp_event_handler(sender, **kwargs):
+    def nlp_event_handler(_sender, **kwargs):
         event_type = kwargs.get("event_type")
         sub_event = kwargs.get("sub_event")
         data = kwargs.get("data", {})
@@ -105,7 +105,9 @@ def main():
         @EventProcessor.emits_event(data=["classifications"])
         def classify(self, tokens: list):
             """Classify tokens."""
-            classification = "greeting" if "hello" in [t.lower() for t in tokens] else "other"
+            classification = (
+                "greeting" if "hello" in [t.lower() for t in tokens] else "other"
+            )
             self.classifications.append(classification)
             print(f"Classification: {classification}")
             return classification

@@ -7,6 +7,7 @@ This example demonstrates:
 """
 
 import asyncio
+
 from champi_signals import BaseSignalManager, EventProcessor, STTEventTypes
 
 
@@ -82,7 +83,7 @@ async def main():
     # Setup signal manager and receivers
     signals = STTSignalManager()
 
-    def event_logger(sender, **kwargs):
+    def event_logger(_sender, **kwargs):
         event = kwargs.get("sub_event", "UNKNOWN")
         event_type = kwargs.get("event_type", "")
         data = kwargs.get("data", {})

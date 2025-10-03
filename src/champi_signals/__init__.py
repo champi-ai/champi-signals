@@ -8,21 +8,20 @@ __version__ = "0.1.0"
 __author__ = "Divagnz"
 
 # Signal manager ABC and base class
+# Enums and setup utilities
+from .enums import (
+    EnumSetup,
+    STTEventTypes,
+    TTSEventTypes,
+)
 from .managers import (
-    SignalManagerABC,
     BaseSignalManager,
+    SignalManagerABC,
 )
 
 # Event processor from champi services
 from .processors import (
     EventProcessor,
-)
-
-# Enums and setup utilities
-from .enums import (
-    STTEventTypes,
-    TTSEventTypes,
-    EnumSetup,
 )
 
 # Main exports

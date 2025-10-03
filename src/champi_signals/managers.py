@@ -2,8 +2,8 @@
 
 from abc import ABC, abstractmethod
 from collections.abc import Callable
-from typing import Any, List, Dict, Type
 from enum import Enum
+
 from blinker import Signal
 
 
@@ -11,9 +11,7 @@ class SignalManagerABC(ABC):
     """Abstract base class for signal managers."""
 
     @abstractmethod
-    def setup_custom_signals(
-        self, signal_config: Dict[str, Type[Enum]]
-    ) -> None:
+    def setup_custom_signals(self, signal_config: dict[str, type[Enum]]) -> None:
         """Setup custom signals based on provided enum configuration.
 
         Args:
@@ -38,17 +36,15 @@ class BaseSignalManager(SignalManagerABC):
     def __init__(self):
         """Initialize singleton instance only once"""
         if not self._signals_initialized:
-            self.signals: Dict[str, Signal] = {}
-            self._class_signals: Dict[str, Signal] = {}
+            self.signals: dict[str, Signal] = {}
+            self._class_signals: dict[str, Signal] = {}
             type(self)._signals_initialized = True
 
-    def get_signals(self) -> List[Signal]:
+    def get_signals(self) -> list[Signal]:
         """Get all registered signals."""
         return list(self.signals.values())
 
-    def setup_custom_signals(
-        self, signal_config: Dict[str, Type[Enum]]
-    ) -> None:
+    def setup_custom_signals(self, signal_config: dict[str, type[Enum]]) -> None:
         """Setup custom signals based on provided enum configuration.
 
         Args:
@@ -56,9 +52,7 @@ class BaseSignalManager(SignalManagerABC):
         """
         for signal_name, enum_type in signal_config.items():
             # Get the first enum value as the signal identifier
-            signal_identifier = (
-                list(enum_type)[0].value if enum_type else signal_name
-            )
+            signal_identifier = list(enum_type)[0].value if enum_type else signal_name
             signal_obj = Signal(signal_identifier)
 
             # Store the signal
@@ -68,15 +62,13 @@ class BaseSignalManager(SignalManagerABC):
             # Create property accessor dynamically
             self._create_signal_property(signal_name, signal_obj)
 
-    def _create_signal_property(
-        self, signal_name: str, signal_obj: Signal
-    ) -> None:
+    def _create_signal_property(self, signal_name: str, signal_obj: Signal) -> None:
         """Create getter/setter properties for a signal."""
 
-        def getter(self):
+        def getter(_self):
             return signal_obj
 
-        def setter(self, receiver: Callable):
+        def setter(_self, receiver: Callable):
             signal_obj.connect(receiver)
 
         # Set the property on the class

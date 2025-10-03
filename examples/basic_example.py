@@ -33,7 +33,7 @@ def main():
     signals = STTSignalManager()
 
     # Connect receiver to processing signal
-    def handle_processing_events(sender, **kwargs):
+    def handle_processing_events(_sender, **kwargs):
         event_type = kwargs.get("event_type")
         sub_event = kwargs.get("sub_event")
         data = kwargs.get("data", {})
@@ -58,14 +58,16 @@ def main():
     )
 
     # You can connect multiple receivers
-    def handle_processing_for_logging(sender, **kwargs):
+    def handle_processing_for_logging(_sender, **kwargs):
         print(f"[LOGGER] Event received: {kwargs.get('sub_event')}")
 
     signals.processing = handle_processing_for_logging
 
     print("\nEmitting with multiple receivers...")
     signals.processing.send(
-        event_type="processing", sub_event="TRANSCRIPTION_ERROR", data={"error": "timeout"}
+        event_type="processing",
+        sub_event="TRANSCRIPTION_ERROR",
+        data={"error": "timeout"},
     )
 
 

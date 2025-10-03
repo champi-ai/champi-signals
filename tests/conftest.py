@@ -1,7 +1,8 @@
 """Pytest configuration and fixtures for champi_signals tests."""
 
-import pytest
 from enum import Enum
+
+import pytest
 
 
 @pytest.fixture

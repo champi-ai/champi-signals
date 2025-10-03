@@ -76,7 +76,7 @@ def main():
     # Get signal manager and connect receivers
     signals = TTSSignalManager()
 
-    def event_logger(sender, **kwargs):
+    def event_logger(_sender, **kwargs):
         event = kwargs.get("sub_event", "UNKNOWN")
         data = kwargs.get("data", {})
         print(f"\n[EVENT] {event}")
@@ -107,7 +107,7 @@ def main():
     print("\n=== Testing Error Handling ===")
 
     @EventProcessor.emits_event(data=["status"])
-    def failing_method(self):
+    def failing_method(_self):
         raise ValueError("Simulated error")
 
     # Temporarily add method to service

@@ -1,8 +1,10 @@
 """Tests for signal managers."""
 
-import pytest
-from champi_signals import BaseSignalManager, SignalManagerABC
 from enum import Enum
+
+import pytest
+
+from champi_signals import BaseSignalManager, SignalManagerABC
 
 
 class TestSignalManagerABC:
@@ -82,10 +84,10 @@ class TestBaseSignalManager:
         received1 = []
         received2 = []
 
-        def receiver1(sender, **kwargs):
+        def receiver1(_sender, **kwargs):
             received1.append(kwargs)
 
-        def receiver2(sender, **kwargs):
+        def receiver2(_sender, **kwargs):
             received2.append(kwargs)
 
         manager.lifecycle = receiver1

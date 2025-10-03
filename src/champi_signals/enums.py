@@ -1,7 +1,6 @@
 """Enums extracted from Champi services with setup methods."""
 
 from enum import Enum, unique
-from typing import Dict, List, Type
 
 
 @unique
@@ -29,8 +28,8 @@ class EnumSetup:
 
     @staticmethod
     def create_event_types(
-        service_name: str, event_categories: List[str] = None
-    ) -> Type[Enum]:
+        service_name: str, event_categories: list[str] = None
+    ) -> type[Enum]:
         """
         Create a custom EventTypes enum for a service.
 
@@ -61,8 +60,8 @@ class EnumSetup:
 
     @staticmethod
     def create_lifecycle_events(
-        service_name: str, custom_events: List[str] = None
-    ) -> Type[Enum]:
+        service_name: str, custom_events: list[str] = None
+    ) -> type[Enum]:
         """
         Create a custom LifecycleEvents enum for a service.
 
@@ -90,8 +89,8 @@ class EnumSetup:
 
     @staticmethod
     def create_processing_events(
-        service_name: str, custom_events: List[str]
-    ) -> Type[Enum]:
+        service_name: str, custom_events: list[str]
+    ) -> type[Enum]:
         """
         Create a custom ProcessingEvents enum for a service.
 
@@ -107,8 +106,8 @@ class EnumSetup:
 
     @staticmethod
     def setup_service_enums(
-        service_name: str, config: Dict[str, List[str]]
-    ) -> Dict[str, Type[Enum]]:
+        service_name: str, config: dict[str, list[str]]
+    ) -> dict[str, type[Enum]]:
         """
         Setup all enums for a service at once.
 
@@ -148,8 +147,6 @@ class EnumSetup:
             if enum_type not in ["event_types", "lifecycle", "processing"]:
                 enum_name = f"{enum_type.title()}Events"
                 enum_attrs = {event.upper(): event.lower() for event in events}
-                result[enum_name] = Enum(
-                    f"{service_name}{enum_name}", enum_attrs
-                )
+                result[enum_name] = Enum(f"{service_name}{enum_name}", enum_attrs)
 
         return result
