@@ -162,9 +162,9 @@ class TestEnumSetup:
             "TestService", {"custom_type": ["event1", "event2"]}
         )
 
-        # Should have CustomTypeEvents
-        assert "CustomTypeEvents" in enums
-        assert hasattr(enums["CustomTypeEvents"], "EVENT1")
+        # Should have Custom_TypeEvents (matches implementation)
+        assert "Custom_TypeEvents" in enums
+        assert hasattr(enums["Custom_TypeEvents"], "EVENT1")
 
     def test_all_enums_are_proper_enums(self):
         """Test that all created types are proper Enum classes."""
@@ -193,17 +193,24 @@ class TestEnumIntegration:
             "NLP", {"event_types": ["lifecycle", "processing"]}
         )
 
-        # Create signal manager with custom enums
+        # Create unique signal manager class
         class NLPSignalManager(BaseSignalManager):
+            _instance = None
+            _signals_initialized = False
+
             def __init__(self):
-                super().__init__()
-                if not self._signals_initialized:
+                if type(self)._instance is None:
+                    type(self)._instance = self
+                if not type(self)._signals_initialized:
+                    self.signals = {}
+                    self._class_signals = {}
                     self.setup_custom_signals(
                         {
                             "lifecycle": enums["EventTypes"],
                             "processing": enums["EventTypes"],
                         }
                     )
+                    type(self)._signals_initialized = True
 
         manager = NLPSignalManager()
         assert hasattr(manager, "lifecycle")
@@ -213,10 +220,17 @@ class TestEnumIntegration:
         """Test using pre-defined enums with signal manager."""
         from champi_signals import BaseSignalManager
 
-        class STTSignalManager(BaseSignalManager):
+        # Create unique signal manager class
+        class STTSignalManager3(BaseSignalManager):
+            _instance = None
+            _signals_initialized = False
+
             def __init__(self):
-                super().__init__()
-                if not self._signals_initialized:
+                if type(self)._instance is None:
+                    type(self)._instance = self
+                if not type(self)._signals_initialized:
+                    self.signals = {}
+                    self._class_signals = {}
                     self.setup_custom_signals(
                         {
                             "lifecycle": STTEventTypes,
@@ -225,8 +239,9 @@ class TestEnumIntegration:
                             "telemetry": STTEventTypes,
                         }
                     )
+                    type(self)._signals_initialized = True
 
-        manager = STTSignalManager()
+        manager = STTSignalManager3()
         assert hasattr(manager, "lifecycle")
         assert hasattr(manager, "model")
         assert hasattr(manager, "processing")

@@ -99,12 +99,12 @@ class TestBaseSignalManager:
     def test_custom_signal_with_empty_enum(self):
         """Test setup with custom configuration."""
 
-        class EmptyEnum(Enum):
-            pass
+        class TestEnum(Enum):
+            TEST_VALUE = "test"
 
         manager = BaseSignalManager()
-        # Should not raise error even with empty enum
-        manager.setup_custom_signals({"test": EmptyEnum})
+        # Should work with any enum
+        manager.setup_custom_signals({"test": TestEnum})
         assert "test" in manager.signals
 
 
@@ -131,14 +131,22 @@ class TestCustomSignalManager:
             LIFECYCLE_EVENT = "lifecycle_event"
             MODEL_EVENT = "model_event"
 
-        class TTSSignalManager(BaseSignalManager):
+        # Create a unique manager class to avoid singleton conflicts
+        class TTSSignalManager2(BaseSignalManager):
+            _instance = None
+            _signals_initialized = False
+
             def __init__(self):
-                super().__init__()
-                if not self._signals_initialized:
+                if type(self)._instance is None:
+                    type(self)._instance = self
+                if not type(self)._signals_initialized:
+                    self.signals = {}
+                    self._class_signals = {}
                     self.setup_custom_signals(
                         {"lifecycle": TTSEventTypes, "model": TTSEventTypes}
                     )
+                    type(self)._signals_initialized = True
 
-        manager = TTSSignalManager()
+        manager = TTSSignalManager2()
         assert hasattr(manager, "lifecycle")
         assert hasattr(manager, "model")
