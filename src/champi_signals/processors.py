@@ -3,6 +3,8 @@
 import asyncio
 import traceback
 
+from loguru import logger
+
 
 def _execute_with_events(
     func, service_instance, args, kwargs, data, metadata, is_async
@@ -27,8 +29,8 @@ def _execute_with_events(
             signals = meta.signal_manager
         elif meta and hasattr(meta, "signal_manager_class"):
             signals = meta.signal_manager_class()
-    except Exception:
-        pass
+    except Exception as _e:
+        logger.debug(f"Failed to extract signal manager: {_e}")
 
     if signals is None:
         # No signal manager found, skip event emission
@@ -76,9 +78,8 @@ def _execute_with_events(
             sub_event=f"{method_name}_START",
             data=start_data,
         )
-    except Exception:
-        # Don't break method execution if event emission fails
-        pass
+    except Exception as _e:
+        logger.debug(f"Failed to emit START event: {_e}")
 
     try:
         # Execute original method
@@ -124,8 +125,8 @@ def _execute_with_events(
                 sub_event=f"{method_name}_FINISH",
                 data=success_data,
             )
-        except Exception:
-            pass
+        except Exception as _e:
+            logger.debug(f"Failed to emit FINISH event: {_e}")
 
         return result
 
@@ -152,8 +153,8 @@ def _execute_with_events(
                 sub_event=f"{method_name}_ERROR",
                 data=error_data,
             )
-        except Exception:
-            pass
+        except Exception as _e:
+            logger.debug(f"Failed to emit ERROR event: {_e}")
 
         # Always re-raise the original exception
         raise ex
