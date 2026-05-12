@@ -1,6 +1,6 @@
 """Enums extracted from Champi services with setup methods."""
 
-from enum import Enum, unique
+from enum import Enum, IntEnum, unique
 
 
 @unique
@@ -21,6 +21,52 @@ class TTSEventTypes(Enum):
     MODEL_EVENT = "model_event"
     PROCESSING_EVENT = "processing_event"
     TELEMETRY_EVENT = "telemetry_event"
+
+
+@unique
+class ImgUIEventTypes(IntEnum):
+    """Integer event type codes for ImgUI service."""
+
+    TOOL_CALL_START = 100
+    TOOL_CALL_FINISH = 101
+    TOOL_CALL_ERROR = 102
+    CANVAS_UPDATE = 110
+    WIDGET_CREATE = 120
+    WIDGET_DELETE = 121
+    RENDER_FRAME = 130
+
+
+def make_event_types(name: str, spec: dict[str, list[str]]) -> type[IntEnum]:
+    """
+    Generate an IntEnum from a declarative spec dict.
+
+    Each key in *spec* becomes a prefix group; each value in the list becomes
+    a member named ``<KEY>_<VALUE>``.  Values are assigned sequentially,
+    starting at 1 and incrementing by 1 across all groups in insertion order.
+
+    Args:
+        name: Name of the resulting IntEnum class.
+        spec: Mapping of group name to list of member suffixes.
+              Example: ``{"PROCESS": ["START", "FINISH", "ERROR"]}``
+
+    Returns:
+        A new IntEnum subclass with the generated members.
+
+    Example::
+
+        MyEvents = make_event_types("MyEvents", {
+            "PROCESS": ["START", "FINISH", "ERROR"],
+            "RENDER": ["BEGIN", "END"],
+        })
+        # MyEvents.PROCESS_START == 1, MyEvents.PROCESS_FINISH == 2, ...
+    """
+    members: dict[str, int] = {}
+    counter = 1
+    for group, suffixes in spec.items():
+        for suffix in suffixes:
+            members[f"{group}_{suffix}"] = counter
+            counter += 1
+    return IntEnum(name, members)  # type: ignore[return-value]
 
 
 class EnumSetup:

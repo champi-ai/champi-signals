@@ -25,6 +25,7 @@ jobs:
 
       - name: Install dependencies
         run: |
+          rm -rf .venv && uv venv
           uv pip install --system -e ".[dev]"
 
       - name: Run ruff format check
@@ -68,6 +69,7 @@ jobs:
 
       - name: Install dependencies
         run: |
+          rm -rf .venv && uv venv
           uv pip install --system -e ".[dev]"
 
       - name: Run tests
@@ -93,6 +95,7 @@ jobs:
 
       - name: Install build tools
         run: |
+          rm -rf .venv && uv venv
           pip install build
 
       - name: Build package

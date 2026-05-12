@@ -1,8 +1,14 @@
 """Tests for enum utilities."""
 
-from enum import Enum
+from enum import Enum, IntEnum
 
-from champi_signals import EnumSetup, STTEventTypes, TTSEventTypes
+from champi_signals import (
+    EnumSetup,
+    ImgUIEventTypes,
+    STTEventTypes,
+    TTSEventTypes,
+    make_event_types,
+)
 
 
 class TestPreDefinedEnums:
@@ -36,6 +42,81 @@ class TestPreDefinedEnums:
 
         tts_values = [e.value for e in TTSEventTypes]
         assert len(tts_values) == len(set(tts_values))
+
+
+class TestImgUIEventTypes:
+    """Tests for ImgUIEventTypes IntEnum."""
+
+    def test_member_values(self):
+        """Test that each member has the correct integer value."""
+        assert ImgUIEventTypes.TOOL_CALL_START == 100
+        assert ImgUIEventTypes.TOOL_CALL_FINISH == 101
+        assert ImgUIEventTypes.TOOL_CALL_ERROR == 102
+        assert ImgUIEventTypes.CANVAS_UPDATE == 110
+        assert ImgUIEventTypes.WIDGET_CREATE == 120
+        assert ImgUIEventTypes.WIDGET_DELETE == 121
+        assert ImgUIEventTypes.RENDER_FRAME == 130
+
+    def test_is_int_enum(self):
+        """ImgUIEventTypes must be an IntEnum subclass."""
+        assert issubclass(ImgUIEventTypes, IntEnum)
+
+    def test_member_count(self):
+        """Exactly 7 members are defined."""
+        assert len(ImgUIEventTypes) == 7
+
+    def test_integer_comparison(self):
+        """IntEnum members compare equal to their integer values."""
+        assert ImgUIEventTypes.TOOL_CALL_START == 100
+        assert ImgUIEventTypes.CANVAS_UPDATE > ImgUIEventTypes.TOOL_CALL_ERROR
+
+
+class TestMakeEventTypes:
+    """Tests for make_event_types factory function."""
+
+    def test_basic_generation(self):
+        """Members are created with GROUP_SUFFIX naming."""
+        ET = make_event_types("ET", {"PROCESS": ["START", "FINISH", "ERROR"]})
+        assert hasattr(ET, "PROCESS_START")
+        assert hasattr(ET, "PROCESS_FINISH")
+        assert hasattr(ET, "PROCESS_ERROR")
+
+    def test_is_int_enum(self):
+        """Returned type is an IntEnum subclass."""
+        ET = make_event_types("MyEvents", {"A": ["X"]})
+        assert issubclass(ET, IntEnum)
+
+    def test_sequential_values(self):
+        """Values are assigned sequentially starting at 1."""
+        ET = make_event_types(
+            "ET", {"PROCESS": ["START", "FINISH"], "RENDER": ["BEGIN", "END"]}
+        )
+        assert ET.PROCESS_START == 1
+        assert ET.PROCESS_FINISH == 2
+        assert ET.RENDER_BEGIN == 3
+        assert ET.RENDER_END == 4
+
+    def test_class_name(self):
+        """The resulting class has the given name."""
+        ET = make_event_types("FooEvents", {"X": ["Y"]})
+        assert ET.__name__ == "FooEvents"
+
+    def test_multi_group(self):
+        """Multiple groups produce the correct total member count."""
+        ET = make_event_types(
+            "ET",
+            {
+                "TOOL": ["START", "FINISH", "ERROR"],
+                "CANVAS": ["UPDATE"],
+                "WIDGET": ["CREATE", "DELETE"],
+            },
+        )
+        assert len(ET) == 6
+
+    def test_empty_spec(self):
+        """An empty spec produces an enum with no members."""
+        ET = make_event_types("Empty", {})
+        assert len(ET) == 0
 
 
 class TestEnumSetup:
