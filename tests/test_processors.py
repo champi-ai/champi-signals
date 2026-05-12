@@ -269,7 +269,9 @@ class TestEmitsAllEvents:
         assert "DO_WORK_FINISH" in sub_events
 
     @pytest.mark.asyncio
-    async def test_async_methods_emit_start_finish(self, received_events, event_receiver):
+    async def test_async_methods_emit_start_finish(
+        self, received_events, event_receiver
+    ):
         """All async public methods should emit START and FINISH events."""
         signals = TestSignalManager()
         signals.processing = event_receiver
@@ -372,7 +374,9 @@ class TestContextManager:
         assert sub_events == ["PROCESSING_START", "PROCESSING_FINISH"]
 
     @pytest.mark.asyncio
-    async def test_exception_emits_error_and_reraises(self, received_events, event_receiver):
+    async def test_exception_emits_error_and_reraises(
+        self, received_events, event_receiver
+    ):
         """Exception path: START then ERROR emitted, exception propagates."""
         signals = TestSignalManager()
         signals.processing = event_receiver
