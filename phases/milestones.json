@@ -1,0 +1,6 @@
+{
+  "Phase 0: Foundation": "phase:0",
+  "Phase 1: IPC Bridge Interface": "phase:1",
+  "Phase 2: Enhanced EventProcessor": "phase:2",
+  "Phase 3: Enum Expansion and Docs": "phase:3"
+}
