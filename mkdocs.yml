@@ -1,0 +1,39 @@
+site_name: champi-signals
+site_description: Signal management and event processing library for Champi voice assistant services
+site_url: https://champi-ai.github.io/champi-signals
+repo_url: https://github.com/champi-ai/champi-signals
+repo_name: champi-ai/champi-signals
+
+theme:
+  name: material
+  palette:
+    - scheme: default
+      primary: indigo
+      accent: indigo
+      toggle:
+        icon: material/brightness-7
+        name: Switch to dark mode
+    - scheme: slate
+      primary: indigo
+      accent: indigo
+      toggle:
+        icon: material/brightness-4
+        name: Switch to light mode
+  features:
+    - navigation.top
+    - search.suggest
+    - search.highlight
+    - content.code.copy
+
+plugins:
+  - search
+  - mkdocstrings:
+      handlers:
+        python:
+          paths: [src]
+          options:
+            docstring_style: google
+            show_source: true
+
+nav:
+  - Home: index.md

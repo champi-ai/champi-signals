@@ -3,54 +3,47 @@ name: Release
 on:
   push:
     tags:
-      - 'v*'
+      - 'v*.*.*'
 
 permissions:
   contents: write
 
 jobs:
   release:
-    name: Create Release
+    name: Build and publish release
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4
         with:
           fetch-depth: 0
 
       - name: Set up Python
-        uses: actions/setup-python@v5
+        uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065 # v5
         with:
           python-version: '3.12'
 
-      - name: Install build tools
-        run: |
-          pip install build twine
+      - name: Install uv
+        uses: astral-sh/setup-uv@38f3f104447c67c051c4a08e39b64a148898af3a # v4
+
+      - name: Create venv
+        run: rm -rf .venv && uv venv
 
       - name: Build package
-        run: python -m build
+        run: uv build
 
       - name: Extract release notes
         id: extract_notes
         run: |
           VERSION=${GITHUB_REF#refs/tags/v}
-          # Extract version section from CHANGELOG.md
           sed -n "/## \[$VERSION\]/,/## \[/p" CHANGELOG.md | sed '$ d' > release_notes.md
           if [ ! -s release_notes.md ]; then
             echo "Release notes for version $VERSION" > release_notes.md
           fi
 
       - name: Create GitHub Release
-        uses: softprops/action-gh-release@v2
+        uses: softprops/action-gh-release@3bb12739c298aeb8a4eeaf626c5b8d85266b0e65 # v2
         with:
           files: dist/*
           body_path: release_notes.md
           draft: false
           prerelease: false
-
-      - name: Publish to PyPI
-        env:
-          TWINE_USERNAME: __token__
-          TWINE_PASSWORD: ${{ secrets.PYPI_API_TOKEN }}
-        run: |
-          twine upload dist/*
-        if: env.TWINE_PASSWORD != ''

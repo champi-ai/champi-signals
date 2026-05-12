@@ -15,12 +15,15 @@ class ProcessingEventTypes(Enum):
 
 
 class TestSignalManager(BaseSignalManager):
-    """Test signal manager."""
+    """Test signal manager — fresh instance per call (no singleton)."""
+
+    def __new__(cls):
+        return object.__new__(cls)
 
     def __init__(self):
-        super().__init__()
-        if not self._signals_initialized:
-            self.setup_custom_signals({"processing": ProcessingEventTypes})
+        self.signals: dict = {}
+        self._class_signals: dict = {}
+        self.setup_custom_signals({"processing": ProcessingEventTypes})
 
 
 class TestEventProcessorSync:
@@ -239,6 +242,174 @@ class TestEventProcessorAsync:
         # Should work without error
         result = service.sync_method()
         assert result == "sync"
+
+
+class TestEmitsAllEvents:
+    """Tests for EventProcessor.emits_all_events class decorator."""
+
+    def test_sync_methods_emit_start_finish(self, received_events, event_receiver):
+        """All sync public methods should emit START and FINISH events."""
+        signals = TestSignalManager()
+        signals.processing = event_receiver
+
+        @EventProcessor.emits_all_events()
+        class MyService:
+            class Meta:
+                event_type = "processing"
+                signal_manager = signals
+
+            def do_work(self):
+                return "done"
+
+        svc = MyService()
+        svc.do_work()
+
+        sub_events = [e["sub_event"] for e in received_events]
+        assert "DO_WORK_START" in sub_events
+        assert "DO_WORK_FINISH" in sub_events
+
+    @pytest.mark.asyncio
+    async def test_async_methods_emit_start_finish(
+        self, received_events, event_receiver
+    ):
+        """All async public methods should emit START and FINISH events."""
+        signals = TestSignalManager()
+        signals.processing = event_receiver
+
+        @EventProcessor.emits_all_events()
+        class MyAsyncService:
+            class Meta:
+                event_type = "processing"
+                signal_manager = signals
+
+            async def run(self):
+                return "ran"
+
+        svc = MyAsyncService()
+        await svc.run()
+
+        sub_events = [e["sub_event"] for e in received_events]
+        assert "RUN_START" in sub_events
+        assert "RUN_FINISH" in sub_events
+
+    def test_error_emits_error_event(self, received_events, event_receiver):
+        """Methods that raise should emit ERROR event."""
+        signals = TestSignalManager()
+        signals.processing = event_receiver
+
+        @EventProcessor.emits_all_events()
+        class FailingService:
+            class Meta:
+                event_type = "processing"
+                signal_manager = signals
+
+            def explode(self):
+                raise RuntimeError("boom")
+
+        svc = FailingService()
+        with pytest.raises(RuntimeError):
+            svc.explode()
+
+        sub_events = [e["sub_event"] for e in received_events]
+        assert "EXPLODE_START" in sub_events
+        assert "EXPLODE_ERROR" in sub_events
+
+    def test_dunder_methods_not_wrapped(self, received_events, event_receiver):
+        """Dunder methods must not be wrapped."""
+        signals = TestSignalManager()
+        signals.processing = event_receiver
+
+        @EventProcessor.emits_all_events()
+        class MyService:
+            class Meta:
+                event_type = "processing"
+                signal_manager = signals
+
+            def public_method(self):
+                return "ok"
+
+        svc = MyService()
+        svc.public_method()
+
+        for e in received_events:
+            assert not e["sub_event"].startswith("__")
+
+    def test_data_forwarded_to_wrapped_methods(self, received_events, event_receiver):
+        """data parameter is forwarded to each emits_event call."""
+        signals = TestSignalManager()
+        signals.processing = event_receiver
+
+        @EventProcessor.emits_all_events(data=["value"])
+        class TrackedService:
+            def __init__(self):
+                self.value = 42
+
+            class Meta:
+                event_type = "processing"
+                signal_manager = signals
+
+            def read(self):
+                return self.value
+
+        svc = TrackedService()
+        svc.read()
+
+        start_event = next(e for e in received_events if e["sub_event"] == "READ_START")
+        assert start_event["data"]["value"] == 42
+
+
+class TestContextManager:
+    """Tests for EventProcessor.context async context manager."""
+
+    @pytest.mark.asyncio
+    async def test_happy_path_emits_start_finish(self, received_events, event_receiver):
+        """Happy path: START then FINISH events are emitted."""
+        signals = TestSignalManager()
+        signals.processing = event_receiver
+
+        async with EventProcessor.context(signals, "processing"):
+            pass
+
+        sub_events = [e["sub_event"] for e in received_events]
+        assert sub_events == ["PROCESSING_START", "PROCESSING_FINISH"]
+
+    @pytest.mark.asyncio
+    async def test_exception_emits_error_and_reraises(
+        self, received_events, event_receiver
+    ):
+        """Exception path: START then ERROR emitted, exception propagates."""
+        signals = TestSignalManager()
+        signals.processing = event_receiver
+
+        with pytest.raises(ValueError, match="oops"):
+            async with EventProcessor.context(signals, "processing"):
+                raise ValueError("oops")
+
+        sub_events = [e["sub_event"] for e in received_events]
+        assert sub_events == ["PROCESSING_START", "PROCESSING_ERROR"]
+        error_event = received_events[1]
+        assert error_event["data"]["error"] == "oops"
+        assert error_event["data"]["error_type"] == "ValueError"
+
+    @pytest.mark.asyncio
+    async def test_data_included_in_events(self, received_events, event_receiver):
+        """Provided data dict appears in emitted events."""
+        signals = TestSignalManager()
+        signals.processing = event_receiver
+
+        async with EventProcessor.context(signals, "processing", data={"job_id": 99}):
+            pass
+
+        assert received_events[0]["data"]["job_id"] == 99
+        assert received_events[1]["data"]["job_id"] == 99
+
+    @pytest.mark.asyncio
+    async def test_missing_signal_no_error(self):
+        """No error raised when signal_manager lacks the attribute."""
+        signals = TestSignalManager()
+
+        async with EventProcessor.context(signals, "nonexistent_signal"):
+            pass
 
 
 class TestEventProcessorEdgeCases:

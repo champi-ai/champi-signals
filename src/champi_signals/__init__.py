@@ -7,12 +7,19 @@ EventProcessor decorators, and enum setup utilities.
 __version__ = "0.1.0"
 __author__ = "Divagnz"
 
+# Signal bridge ABC
+from .bridges import (
+    SignalBridgeABC,
+)
+
 # Signal manager ABC and base class
 # Enums and setup utilities
 from .enums import (
     EnumSetup,
+    ImgUIEventTypes,
     STTEventTypes,
     TTSEventTypes,
+    make_event_types,
 )
 from .managers import (
     BaseSignalManager,
@@ -26,6 +33,8 @@ from .processors import (
 
 # Main exports
 __all__ = [
+    # Signal bridge
+    "SignalBridgeABC",
     # Signal manager infrastructure
     "SignalManagerABC",
     "BaseSignalManager",
@@ -34,5 +43,7 @@ __all__ = [
     # Enums
     "STTEventTypes",
     "TTSEventTypes",
+    "ImgUIEventTypes",
     "EnumSetup",
+    "make_event_types",
 ]

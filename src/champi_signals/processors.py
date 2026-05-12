@@ -1,7 +1,9 @@
 """Event processor extracted from Champi services."""
 
 import asyncio
+import inspect
 import traceback
+from contextlib import asynccontextmanager
 
 
 def _execute_with_events(
@@ -347,3 +349,110 @@ class EventProcessor:
             return wrapper
 
         return decorator
+
+    @classmethod
+    def emits_all_events(cls, data=None):
+        """
+        Class decorator that applies ``emits_event`` to every public, non-dunder
+        method on the decorated class, excluding any inner ``Meta`` class.
+
+        Args:
+            data: List of variable names to track, forwarded to each ``emits_event``
+                call (supports ``'cls.var'`` for class-level attributes).
+
+        Returns:
+            A class decorator that wraps all eligible methods with event emission.
+
+        Example::
+
+            @EventProcessor.emits_all_events(data=["status"])
+            class MyService:
+                class Meta:
+                    event_type = "processing"
+                    signal_manager = my_signals
+        """
+
+        def decorator(klass):
+            for name, method in inspect.getmembers(klass, predicate=inspect.isfunction):
+                if name.startswith("_"):
+                    continue
+                if name == "Meta":
+                    continue
+                wrapped = cls.emits_event(data=data)(method)
+                setattr(klass, name, wrapped)
+            return klass
+
+        return decorator
+
+    @staticmethod
+    @asynccontextmanager
+    async def context(signal_manager, event_type, data=None):
+        """
+        Async context manager that emits lifecycle events around a code block.
+
+        Emits ``<event_type>_START`` on entry, ``<event_type>_FINISH`` on clean
+        exit, and ``<event_type>_ERROR`` (then re-raises) if an exception
+        propagates.
+
+        Args:
+            signal_manager: A signal manager instance whose attribute named
+                ``event_type`` is a signal accepting ``send(event_type=...,
+                sub_event=..., data=...)``.
+            event_type: String key used to look up the signal on
+                ``signal_manager`` and as the ``event_type`` value in emitted
+                events.
+            data: Optional dict of arbitrary data included in every emitted event.
+
+        Raises:
+            Exception: Any exception raised inside the ``async with`` block is
+                re-raised after the ``<event_type>_ERROR`` event is emitted.
+
+        Example::
+
+            async with EventProcessor.context(signals, "processing", data={"job": 1}):
+                await do_work()
+        """
+        try:
+            signal = getattr(signal_manager, event_type)
+        except AttributeError:
+            signal = None
+
+        event_data = dict(data or {})
+
+        if signal is not None:
+            try:
+                signal.send(
+                    event_type=event_type,
+                    sub_event=f"{event_type.upper()}_START",
+                    data=event_data,
+                )
+            except Exception:
+                pass
+
+        try:
+            yield
+        except Exception as ex:
+            if signal is not None:
+                try:
+                    signal.send(
+                        event_type=event_type,
+                        sub_event=f"{event_type.upper()}_ERROR",
+                        data={
+                            **event_data,
+                            "error": str(ex),
+                            "error_type": type(ex).__name__,
+                        },
+                    )
+                except Exception:
+                    pass
+            raise
+        else:
+            if signal is not None:
+                try:
+                    signal.send(
+                        event_type=event_type,
+                        sub_event=f"{event_type.upper()}_FINISH",
+                        data=event_data,
+                    )
+                except Exception:
+                    pass

@@ -33,6 +33,12 @@ Repository = "https://github.com/Divagnz/champi-signals.git"
 Issues = "https://github.com/Divagnz/champi-signals/issues"
 Changelog = "https://github.com/Divagnz/champi-signals/blob/main/CHANGELOG.md"
 
+[dependency-groups]
+docs = [
+    "mkdocs-material>=9.5",
+    "mkdocstrings-python>=1.8",
+]
+
 [project.optional-dependencies]
 dev = [
     "pytest>=8.0.0",
@@ -93,6 +99,7 @@ addopts = [
     "--cov=champi_signals",
     "--cov-report=term-missing",
     "--cov-report=html",
+    "--cov-fail-under=80",
 ]
 asyncio_mode = "auto"
 markers = [
