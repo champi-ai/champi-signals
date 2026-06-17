@@ -2,54 +2,54 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
     <url>
          <loc>https://champi-ai.github.io/champi-signals/</loc>
-         <lastmod>2026-05-12</lastmod>
+         <lastmod>2026-06-17</lastmod>
     </url>
     <url>
          <loc>https://champi-ai.github.io/champi-signals/changelog/</loc>
-         <lastmod>2026-05-12</lastmod>
+         <lastmod>2026-06-17</lastmod>
     </url>
     <url>
          <loc>https://champi-ai.github.io/champi-signals/integration/</loc>
-         <lastmod>2026-05-12</lastmod>
+         <lastmod>2026-06-17</lastmod>
     </url>
     <url>
          <loc>https://champi-ai.github.io/champi-signals/api/bridges/</loc>
-         <lastmod>2026-05-12</lastmod>
+         <lastmod>2026-06-17</lastmod>
     </url>
     <url>
          <loc>https://champi-ai.github.io/champi-signals/api/enums/</loc>
-         <lastmod>2026-05-12</lastmod>
+         <lastmod>2026-06-17</lastmod>
     </url>
     <url>
          <loc>https://champi-ai.github.io/champi-signals/api/managers/</loc>
-         <lastmod>2026-05-12</lastmod>
+         <lastmod>2026-06-17</lastmod>
     </url>
     <url>
          <loc>https://champi-ai.github.io/champi-signals/api/processors/</loc>
-         <lastmod>2026-05-12</lastmod>
+         <lastmod>2026-06-17</lastmod>
     </url>
     <url>
          <loc>https://champi-ai.github.io/champi-signals/phases/phase-0-foundation/</loc>
-         <lastmod>2026-05-12</lastmod>
+         <lastmod>2026-06-17</lastmod>
     </url>
     <url>
          <loc>https://champi-ai.github.io/champi-signals/phases/phase-1-ipc-bridge/</loc>
-         <lastmod>2026-05-12</lastmod>
+         <lastmod>2026-06-17</lastmod>
     </url>
     <url>
          <loc>https://champi-ai.github.io/champi-signals/phases/phase-2-enhanced-processor/</loc>
-         <lastmod>2026-05-12</lastmod>
+         <lastmod>2026-06-17</lastmod>
     </url>
     <url>
          <loc>https://champi-ai.github.io/champi-signals/phases/phase-3-enums-and-docs/</loc>
-         <lastmod>2026-05-12</lastmod>
+         <lastmod>2026-06-17</lastmod>
     </url>
     <url>
          <loc>https://champi-ai.github.io/champi-signals/specs/backend/</loc>
-         <lastmod>2026-05-12</lastmod>
+         <lastmod>2026-06-17</lastmod>
     </url>
     <url>
          <loc>https://champi-ai.github.io/champi-signals/specs/frontend/</loc>
-         <lastmod>2026-05-12</lastmod>
+         <lastmod>2026-06-17</lastmod>
     </url>
 </urlset>
