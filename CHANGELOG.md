@@ -7,6 +7,31 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.2.0] - 2026-06-17
+
+### Added
+
+- **IPC Signal Bridge**
+  - `SignalBridgeABC` — Abstract base class for bridging blinker signals to external transports
+  - Lifecycle interface: `connect()`, `disconnect()`, `start()`, `stop()`, `is_connected`
+
+- **Enhanced EventProcessor**
+  - `EventProcessor.emits_all_events()` — Class decorator that applies `emits_event` to every public, non-dunder method on a class
+  - `EventProcessor.context()` — Async context manager emitting `START`/`FINISH`/`ERROR` events around arbitrary code blocks
+
+- **Enum Expansion**
+  - `ImgUIEventTypes` — Integer event type codes for ImgUI service (tool calls, canvas updates, widgets, render frames)
+  - `make_event_types()` — Generate an `IntEnum` from a declarative spec dict with sequential values
+
+- **Documentation**
+  - MkDocs Material documentation site with mkdocstrings-python for API reference
+  - GitHub Pages deployment via dedicated `docs.yml` workflow
+
+- **CI / Infrastructure**
+  - `docs.yml` — deploys MkDocs to GitHub Pages on push to `main`
+  - `release.yml` — builds package and creates a GitHub Release on `v*.*.*` tags
+  - All third-party GitHub Actions pinned to immutable commit SHAs
+
 ## [0.1.0] - 2025-10-03
 
 ### Added
@@ -64,5 +89,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **Progress Monitoring**: Track long-running async operations with periodic variable emission
 - **Type Safety**: Full type hints and py.typed marker for type checkers
 
-[Unreleased]: https://github.com/Divagnz/champi-signals/compare/v0.1.0...HEAD
-[0.1.0]: https://github.com/Divagnz/champi-signals/releases/tag/v0.1.0
+[Unreleased]: https://github.com/champi-ai/champi-signals/compare/v0.2.0...HEAD
+[0.2.0]: https://github.com/champi-ai/champi-signals/compare/v0.1.0...v0.2.0
+[0.1.0]: https://github.com/champi-ai/champi-signals/releases/tag/v0.1.0

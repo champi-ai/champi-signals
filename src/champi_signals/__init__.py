@@ -4,7 +4,7 @@ This library provides signal management infrastructure with ABC for custom manag
 EventProcessor decorators, and enum setup utilities.
 """
 
-__version__ = "0.1.0"
+__version__ = "0.2.0"
 __author__ = "Divagnz"
 
 # Signal bridge ABC

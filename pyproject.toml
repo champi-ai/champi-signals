@@ -4,7 +4,7 @@ build-backend = "hatchling.build"
 
 [project]
 name = "champi-signals"
-version = "0.1.0"
+version = "0.2.0"
 description = "Signal management and event processing library for Champi voice assistant services"
 readme = "README.md"
 license = {file = "LICENSE"}
@@ -28,10 +28,10 @@ classifiers = [
 ]
 
 [project.urls]
-Homepage = "https://github.com/Divagnz/champi-signals"
-Repository = "https://github.com/Divagnz/champi-signals.git"
-Issues = "https://github.com/Divagnz/champi-signals/issues"
-Changelog = "https://github.com/Divagnz/champi-signals/blob/main/CHANGELOG.md"
+Homepage = "https://github.com/champi-ai/champi-signals"
+Repository = "https://github.com/champi-ai/champi-signals.git"
+Issues = "https://github.com/champi-ai/champi-signals/issues"
+Changelog = "https://github.com/champi-ai/champi-signals/blob/main/CHANGELOG.md"
 
 [dependency-groups]
 docs = [
@@ -130,7 +130,7 @@ exclude_lines = [
 # Commitizen configuration
 [tool.commitizen]
 name = "cz_conventional_commits"
-version = "0.1.0"
+version = "0.2.0"
 tag_format = "v$version"
 version_files = [
     "pyproject.toml:version",
